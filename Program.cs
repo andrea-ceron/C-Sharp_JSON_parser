@@ -2,6 +2,8 @@
 using System.Text;
 using System;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 string URL = "https://www.istat.it/wp-content/themes/EGPbs5-child/contanomi/nati/index2022.php?type=list&limit=200&year=2022";
 HttpHandler x = new(URL);
@@ -15,16 +17,44 @@ if(JsonString == null)
 
 try
 {
-    if (JsonString.StartsWith("callback") && JsonString.EndsWith(");"))
+    if (JsonString.StartsWith("callback(") && JsonString.EndsWith(");") && JsonString != null)
     {
-        Console.WriteLine(JsonString.Length);
         int length = JsonString.Length-11;
-        Console.WriteLine(length);
         JsonString = JsonString.Substring(9, length);
-        JsonString = JsonString + ";";
         //Console.WriteLine(JsonString);
-        List<ISTAT_Details>? y = JsonSerializer.Deserialize<List<ISTAT_Details>>(JsonString);
-        //Console.WriteLine(y[0].Year);
+
+        string newjson = @"{
+            ""years"": [2022],
+            ""0"": [
+                {""year"": 2022, ""name"": ""MATIAS"", ""count"": 112, ""gender"": ""m"", ""percent"": 0.055319569297639},
+                {""year"": 2022, ""name"": ""ANTHONY"", ""count"": 109, ""gender"": ""m"", ""percent"": 0.053837795120024}
+            ],
+            ""1"": [
+                {""year"": 2022, ""name"": ""ATENA"", ""count"": 108, ""gender"": ""f"", ""percent"": 0.056808618077765},
+                {""year"": 2022, ""name"": ""CELINE"", ""count"": 108, ""gender"": ""f"", ""percent"": 0.056808618077765}
+            ]
+        }";
+
+
+        var data = JsonSerializer.Deserialize<GenderNames>(JsonString);
+        Console.WriteLine("\nYears:");
+        foreach (var y in data.Years)
+        {
+            Console.WriteLine($"Anno: {y}");
+        }
+
+        Console.WriteLine("\nMale:");
+        foreach (var male in data.Male)
+        {
+            Console.WriteLine($"Name: {male.Name}, Count: {male.Count}, Percent: {male.Percent}");
+        }
+
+        Console.WriteLine("\nFemale:");
+        foreach (var female in data.Female)
+        {
+            Console.WriteLine($"Name: {female.Name}, Count: {female.Count}, Percent: {female.Percent}");
+        }
+
     }
 
 }
@@ -38,35 +68,14 @@ catch (Exception ex)
 
 class GenderNames
 {
-    private List<int>? _year;
-    private List<ISTAT_Details> _male;
-    private List<ISTAT_Details> _female;
+    [JsonPropertyName("years")]
+    public IList<int> Years { get; set; }
 
+    [JsonPropertyName("0")]
+    public IList<ISTAT_Details> Male { get; set; }
 
-    public List<int>? Years
-    {
-        get {
-            return _year;
-        }  // Getter
-        set {
-            _year = value;
-        } // Setter
-    }
-
-    public List<ISTAT_Details> Male
-    {
-        get { return _male; }  // Getter
-        set => _male=value;  // Setter
-    }
-
-    public List<ISTAT_Details> Female
-    {
-        get { return _female; }  // Getter
-        set { _female = value; } // Setter
-    }
-
-
-
+    [JsonPropertyName("1")]
+    public IList<ISTAT_Details> Female { get; set; }
 
 };
 
@@ -74,41 +83,23 @@ class GenderNames
 
 class ISTAT_Details 
 {
-    private int _year;
-    private string _name;
-    private int _count;
-    private bool _gender ;
-    private double _percentage;
+    [JsonPropertyName("1year")]
+    public int Year { get; set; }
 
-    public int Year
-    {
-        get { return _year; }  // Getter
-        set { _year = value; } // Setter
-    }
+    [JsonPropertyName("name")]
+    public string Name { get; set; }
 
-    public string Name
-    {
-        get { return _name; }  // Getter
-        set { _name = value; } // Setter
-    }
+    [JsonPropertyName("count")]
+    public int Count { get; set; }
 
-    public int Count
-    {
-        get { return _count; }  // Getter
-        set { _count = value; } // Setter
-    }
+    [JsonPropertyName("gender")]
+    public char Gender { get; set; }
 
-    public bool Gender
-    {
-        get { return _gender; }  // Getter
-        set { _gender = value; } // Setter
-    }
+    [JsonPropertyName("percent")]
+    public double Percent { get; set; }
 
-    public double Percentage
-    {
-        get { return _percentage; }  // Getter
-        set { _percentage = value; } // Setter
-    }
+
+
 
 
 };

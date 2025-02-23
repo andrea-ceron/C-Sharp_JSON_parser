@@ -12,10 +12,8 @@ class HttpHandler {
         try
         {
             string res = await client.GetStringAsync(URL);
-            Console.WriteLine("eseguito il get");
             if(res != null)
             {
-                Console.WriteLine("res non è nullo");
                 string Print = res.ToString();
                 return Print;
 
