@@ -23,20 +23,11 @@ try
         JsonString = JsonString.Substring(9, length);
         //Console.WriteLine(JsonString);
 
-        string newjson = @"{
-            ""years"": [2022],
-            ""0"": [
-                {""year"": 2022, ""name"": ""MATIAS"", ""count"": 112, ""gender"": ""m"", ""percent"": 0.055319569297639},
-                {""year"": 2022, ""name"": ""ANTHONY"", ""count"": 109, ""gender"": ""m"", ""percent"": 0.053837795120024}
-            ],
-            ""1"": [
-                {""year"": 2022, ""name"": ""ATENA"", ""count"": 108, ""gender"": ""f"", ""percent"": 0.056808618077765},
-                {""year"": 2022, ""name"": ""CELINE"", ""count"": 108, ""gender"": ""f"", ""percent"": 0.056808618077765}
-            ]
-        }";
 
 
         var data = JsonSerializer.Deserialize<GenderNames>(JsonString);
+        Sorter st = new(data.Male, data.Female);
+        st.SortingAlg();
         Console.WriteLine("\nYears:");
         foreach (var y in data.Years)
         {
@@ -46,14 +37,14 @@ try
         Console.WriteLine("\nMale:");
         foreach (var male in data.Male)
         {
-            Console.WriteLine($"Name: {male.Name}, Count: {male.Count}, Percent: {male.Percent}");
+            Console.WriteLine($"Name: {male.Name}, Sesso: {male.Gender}, Count: {male.Count}");
         }
 
-        Console.WriteLine("\nFemale:");
-        foreach (var female in data.Female)
-        {
-            Console.WriteLine($"Name: {female.Name}, Count: {female.Count}, Percent: {female.Percent}");
-        }
+        //Console.WriteLine("\nFemale:");
+        //foreach (var female in data.Female)
+        //{
+        //    Console.WriteLine($"Name: {female.Name}, Count: {female.Count}, Percent: {female.Percent}");
+        //}
 
     }
 
@@ -83,7 +74,7 @@ class GenderNames
 
 class ISTAT_Details 
 {
-    [JsonPropertyName("1year")]
+    [JsonPropertyName("year")]
     public int Year { get; set; }
 
     [JsonPropertyName("name")]
